@@ -1,0 +1,449 @@
+.dashboard-container {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--color-bg-main);
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-text h1 {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.header-text p {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.dashboard-main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Poll Creator */
+.creator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.creator-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.timer-select-wrapper {
+    position: relative;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+}
+
+.timer-select {
+    appearance: none;
+    background: transparent;
+    border: none;
+    padding-right: 20px;
+    font-size: 14px;
+    color: var(--color-text-main);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.timer-select:focus {
+    outline: none;
+}
+
+.select-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-main);
+    pointer-events: none;
+}
+
+.question-input-wrapper {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.question-textarea {
+    width: 100%;
+    height: 120px;
+    background-color: var(--color-bg-input);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-size: 16px;
+    color: var(--color-text-main);
+    resize: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.question-textarea:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 1px #d1d5db;
+}
+
+.char-count {
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.options-section {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.options-column {
+    flex: 2;
+}
+
+.correct-column {
+    flex: 1;
+}
+
+.options-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--color-text-main);
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.option-number {
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.option-input {
+    flex: 1;
+    background-color: var(--color-bg-input);
+    border: none;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--color-text-main);
+}
+
+.option-input:focus {
+    outline: none;
+}
+
+.add-option-btn {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+
+.add-option-btn:hover {
+    background-color: var(--color-primary-light);
+}
+
+.correct-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.correct-row {
+    height: 43px;
+    /* Match option input height */
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-main);
+    cursor: pointer;
+}
+
+.radio-label input {
+    display: none;
+}
+
+.radio-custom {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.radio-label input:checked+.radio-custom {
+    border-color: var(--color-primary);
+}
+
+.radio-label input:checked+.radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+}
+
+.action-footer {
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Active Poll View */
+.active-header {
+    margin-bottom: 16px;
+}
+
+.active-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.active-question-card {
+    border: 1px solid var(--color-primary-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.active-question-text {
+    background-color: #4b5563;
+    /* Dark gray for header */
+    color: white;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.active-options {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.active-option-bar {
+    position: relative;
+    height: 48px;
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.option-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--color-primary);
+    transition: width 0.5s ease-out;
+}
+
+.option-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+}
+
+.option-number-small {
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.option-label-text {
+    color: white;
+    /* Make text white to show over the purple properly */
+    font-weight: 500;
+    mix-blend-mode: difference;
+    /* Help text visibility over progress */
+}
+
+.active-footer {
+    display: flex;
+    justify-content: center;
+}
+
+.new-q-btn {
+    border-radius: var(--radius-full);
+}
+
+/* Chat Floating */
+.floating-chat-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    transition: transform 0.2s;
+}
+
+.floating-chat-btn:hover {
+    transform: scale(1.05);
+}
+
+.chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 32px;
+    width: 320px;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    z-index: 99;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.chat-tab {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.chat-tab.active {
+    color: var(--color-text-main);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.chat-messages {
+    padding: 16px;
+    height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-sender {
+    font-size: 12px;
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.message-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    max-width: 85%;
+}
+
+.message.received {
+    align-items: flex-start;
+}
+
+.message.received .message-bubble {
+    background-color: #3f3f46;
+    color: white;
+    border-top-left-radius: 2px;
+}
+
+.message.sent {
+    align-items: flex-end;
+}
+
+.message.sent .message-sender {
+    text-align: right;
+}
+
+.message.sent .message-bubble {
+    background-color: #a78bfa;
+    color: white;
+    border-bottom-right-radius: 2px;
+}

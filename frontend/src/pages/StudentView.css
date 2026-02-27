@@ -1,0 +1,174 @@
+.student-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+.badge-center {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.waiting-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+}
+
+.spinner-ring {
+    width: 64px;
+    height: 64px;
+    border: 6px solid var(--color-primary-light);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 24px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.waiting-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-align: center;
+}
+
+/* Status Cards */
+.completed-card,
+.success-card {
+    padding: 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    margin-top: 40px;
+}
+
+.icon-completed {
+    color: var(--color-text-muted);
+}
+
+.icon-success {
+    color: var(--color-success);
+}
+
+.completed-card h3,
+.success-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Active Poll Layout */
+.student-active-poll {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 24px;
+}
+
+.student-question-text {
+    background-color: #4b5563;
+    /* Dark gray for header */
+    color: white;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.student-options-list {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.student-option-btn {
+    width: 100%;
+    height: 48px;
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.student-option-btn:hover {
+    border-color: #cbd5e1;
+}
+
+.student-option-btn.selected {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.option-pill-number {
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.student-option-btn.selected .option-pill-number {
+    border-color: transparent;
+}
+
+.student-option-btn .option-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-main);
+    flex-grow: 1;
+    text-align: left;
+}
+
+.student-option-btn.selected .option-text {
+    color: white;
+}
+
+.student-action-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.submit-btn {
+    transition: all 0.2s;
+}
+
+.submit-btn.disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.submit-btn.disabled:hover {
+    transform: none;
+}
