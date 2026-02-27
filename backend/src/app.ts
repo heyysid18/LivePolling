@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import pollRoutes from './routes/poll.routes';
+import { getActivePoll } from './controllers/PollController';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -20,6 +21,9 @@ connectDB();
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', message: 'Polling Server is running' });
 });
+
+// Alias for root path active poll check
+app.get('/poll/active', getActivePoll);
 
 // API Routes
 app.use('/api/polls', pollRoutes);

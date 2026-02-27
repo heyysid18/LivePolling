@@ -19,6 +19,7 @@ interface AppState {
 interface SocketContextContextType {
     socket: Socket | null;
     appState: AppState;
+    isLoading: boolean;
     setRole: (role: 'teacher' | 'student', name?: string) => void;
     createPoll: (question: string, options: { id: string, text: string }[], timerDuration: number) => void;
     endPoll: () => void;
@@ -29,6 +30,7 @@ interface SocketContextContextType {
 const SocketContext = createContext<SocketContextContextType | undefined>(undefined);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [isLoading, setIsLoading] = useState(true);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [appState, setAppState] = useState<AppState>({
         role: null,
@@ -57,6 +59,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             studentName: sName,
             studentId: sId,
         }));
+
+        // Fetch REST active poll to prevent UI flash before Socket connect
+        fetch(`${SOCKET_URL}/api/polls/active`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && data.data.poll) {
+                    setAppState(prev => ({ ...prev, activePoll: data.data.poll }));
+                }
+            })
+            .catch(err => console.error("Could not fetch active poll on load:", err))
+            .finally(() => {
+                setIsLoading(false);
+            });
 
         // 2. Initialize Socket and reconnect behavior
         const newSocket = io(SOCKET_URL, {
@@ -186,7 +201,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     return (
-        <SocketContext.Provider value={{ socket, appState, setRole, createPoll, endPoll, castVote, resetState }}>
+        <SocketContext.Provider value={{ socket, appState, isLoading, setRole, createPoll, endPoll, castVote, resetState }}>
             {children}
         </SocketContext.Provider>
     );

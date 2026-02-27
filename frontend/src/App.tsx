@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useSocketContext } from './contexts/SocketContext';
+import { Loader2 } from 'lucide-react';
 
 // Legacy components for fallback/redirects during transition
 import Landing from './pages/Landing';
@@ -15,7 +16,21 @@ import PollQuestion from './pages/student/PollQuestion';
 import LiveResults from './pages/student/LiveResults';
 
 const App: React.FC = () => {
-  const { appState } = useSocketContext();
+  const { appState, isLoading } = useSocketContext();
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#F8E9F0' }}>
+        <Loader2 className="loading-spinner" size={48} color="#FF4D4D" style={{ animation: 'spin 1s linear infinite' }} />
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <Router>
