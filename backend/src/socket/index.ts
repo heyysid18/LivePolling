@@ -16,7 +16,7 @@ export default function setupSocket(io: Server) {
         console.log('Client connected:', socket.id);
 
         // Student/Teacher joins or reconnects
-        socket.on('join_poll', async (data: { studentId?: string, role: string }) => {
+        socket.on('join_poll', async (data: { studentId?: string, studentName?: string, role: string }) => {
             try {
                 const activePoll = await PollService.getActivePoll();
                 if (activePoll) {
@@ -26,7 +26,7 @@ export default function setupSocket(io: Server) {
 
                     // If student refreshes and had already voted, resume their state
                     if (data.studentId && data.role === 'student') {
-                        const vote = await PollService.getStudentVote(activePoll._id.toString(), data.studentId);
+                        const vote = await PollService.getStudentVote(activePoll._id.toString(), data.studentId, data.studentName);
                         if (vote) {
                             socket.emit('vote_recovered', vote.selectedOption);
                         }

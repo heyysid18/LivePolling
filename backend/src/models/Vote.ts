@@ -17,6 +17,6 @@ const VoteSchema: Schema = new Schema({
 });
 
 // Compound index to prevent multiple votes per student per poll
-VoteSchema.index({ pollId: 1, studentId: 1 }, { unique: true });
+VoteSchema.index({ pollId: 1, studentName: 1 }, { unique: true });
 
 export default mongoose.model<IVote>('Vote', VoteSchema);

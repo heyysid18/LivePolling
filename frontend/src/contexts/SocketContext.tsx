@@ -83,7 +83,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         // Initial Join explicitly passes identity for recovery
         newSocket.on('connect', () => {
-            newSocket.emit('join_poll', { studentId: sId, role: sRole });
+            newSocket.emit('join_poll', { studentId: sId, studentName: sName, role: sRole });
         });
 
         newSocket.on('poll_started', (poll: Poll) => {
@@ -151,7 +151,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         // Rejoin to sync state for new role
         if (socket) {
-            socket.emit('join_poll', { studentId: sId, role });
+            socket.emit('join_poll', { studentId: sId, studentName: name || undefined, role });
         }
     };
 

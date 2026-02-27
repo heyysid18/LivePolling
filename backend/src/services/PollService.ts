@@ -104,11 +104,13 @@ class PollServiceClass extends EventEmitter {
             if (!poll) throw new Error('Poll not found');
             if (poll.status !== 'active') throw new Error('Poll is no longer active');
 
-            // 2. Prevent duplicate votes via DB
-            const existingVote = await Vote.findOne({ pollId, studentId }).session(session);
+            // 2. Prevent duplicate votes via DB read barrier
+            const existingVote = await Vote.findOne({ pollId, studentName }).session(session);
             if (existingVote) throw new Error('You have already voted on this poll');
 
             // 3. Record the vote
+            // If API spam reaches this point bypassing the findOne read due to parallel execution, 
+            // the unique compound index on (pollId + studentName) will instantly block this save with code 11000
             const vote = new Vote({ pollId, studentId, studentName, selectedOption });
             await vote.save({ session });
 
@@ -123,8 +125,12 @@ class PollServiceClass extends EventEmitter {
 
             await session.commitTransaction();
             return updatedPoll;
-        } catch (error) {
+        } catch (error: any) {
             await session.abortTransaction();
+            // True atomic protection against race conditions / parallel API spam
+            if (error.code === 11000) {
+                throw new Error('You have already voted on this poll');
+            }
             throw error;
         } finally {
             session.endSession();
@@ -134,8 +140,14 @@ class PollServiceClass extends EventEmitter {
     /**
      * Gets specific student's vote for a poll
      */
-    async getStudentVote(pollId: string, studentId: string): Promise<IVote | null> {
-        return await Vote.findOne({ pollId, studentId });
+    async getStudentVote(pollId: string, studentId: string, studentName?: string): Promise<IVote | null> {
+        if (!studentName) {
+            return await Vote.findOne({ pollId, studentId });
+        }
+        return await Vote.findOne({
+            pollId,
+            $or: [{ studentId }, { studentName }]
+        });
     }
 
     /**
