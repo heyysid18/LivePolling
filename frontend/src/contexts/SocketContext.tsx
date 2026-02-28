@@ -14,6 +14,8 @@ interface AppState {
     currentTimer: number;
     hasVotedForActivePoll: boolean;
     votedOptionId: string | null;
+    connectedStudents: { studentId: string, studentName: string }[];
+    studentRemoved: boolean;
 }
 
 interface SocketContextContextType {
@@ -23,6 +25,7 @@ interface SocketContextContextType {
     setRole: (role: 'teacher' | 'student', name?: string) => void;
     createPoll: (question: string, options: { id: string, text: string }[], timerDuration: number) => void;
     endPoll: () => void;
+    removeStudent: (pollId: string, studentName: string) => void;
     castVote: (optionId: string) => void;
     resetState: () => void;
 }
@@ -40,6 +43,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         currentTimer: 0,
         hasVotedForActivePoll: false,
         votedOptionId: null,
+        connectedStudents: [],
+        studentRemoved: false,
     });
 
     useEffect(() => {
@@ -83,7 +88,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         // Initial Join explicitly passes identity for recovery
         newSocket.on('connect', () => {
-            newSocket.emit('join_poll', { studentId: sId, studentName: sName, role: sRole });
+            console.log(`[SocketContext] Connected to backend! Socket ID: ${newSocket.id}`);
+
+            // Re-fetch from session storage here because closures might be stale during reconnects
+            const currentRole = sessionStorage.getItem('polling_role');
+            const currentId = sessionStorage.getItem('polling_student_id');
+            const currentName = sessionStorage.getItem('polling_student_name');
+
+            console.log(`[SocketContext] Emitting join_poll on connect: Role=${currentRole}, Name=${currentName}`);
+            newSocket.emit('join_poll', {
+                studentId: currentId,
+                studentName: currentName || undefined,
+                role: currentRole
+            });
         });
 
         newSocket.on('poll_started', (poll: Poll) => {
@@ -123,6 +140,17 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             toast.error(msg);
         });
 
+        newSocket.on('student_list_updated', (students: { studentId: string, studentName: string }[]) => {
+            console.log('[SocketContext] Received student_list_updated', students);
+            const unique = Array.from(new Map(students.map(s => [s.studentName, s])).values());
+            console.log('[SocketContext] Setting appState.connectedStudents:', unique);
+            setAppState(prev => ({ ...prev, connectedStudents: unique }));
+        });
+
+        newSocket.on('student_removed', () => {
+            setAppState(prev => ({ ...prev, studentRemoved: true }));
+        });
+
         return () => {
             newSocket.disconnect();
         };
@@ -151,7 +179,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         // Rejoin to sync state for new role
         if (socket) {
-            socket.emit('join_poll', { studentId: sId, studentName: name || undefined, role });
+            console.log(`[SocketContext] Emitting join_poll for role: ${role}, name: ${name}`);
+
+            // If socket is disconnected, connect it. The 'connect' event listener will handle the emit.
+            // If it IS connected, emit immediately.
+            if (!socket.connected) {
+                console.log(`[SocketContext] Socket disconnected. Calling connect() and waiting for listener...`);
+                socket.connect();
+            } else {
+                console.log(`[SocketContext] Socket already connected. Emitting directly.`);
+                socket.emit('join_poll', { studentId: sId, studentName: name || undefined, role });
+            }
+        } else {
+            console.error('[SocketContext] Socket is null during setRole!');
         }
     };
 
@@ -169,6 +209,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const endPoll = () => {
         if (socket && appState.role === 'teacher' && appState.activePoll) {
             socket.emit('end_poll', { pollId: appState.activePoll._id });
+        }
+    };
+
+    const removeStudent = (pollId: string, studentName: string) => {
+        if (socket && appState.role === 'teacher') {
+            socket.emit('teacher_remove_student', { pollId, studentName });
         }
     };
 
@@ -196,12 +242,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             currentTimer: 0,
             hasVotedForActivePoll: false,
             votedOptionId: null,
+            connectedStudents: [],
+            studentRemoved: false,
         });
         // Let socket know we're basically resetting context (optional, but good practice if needed)
     };
 
     return (
-        <SocketContext.Provider value={{ socket, appState, isLoading, setRole, createPoll, endPoll, castVote, resetState }}>
+        <SocketContext.Provider value={{ socket, appState, isLoading, setRole, createPoll, endPoll, removeStudent, castVote, resetState }}>
             {children}
         </SocketContext.Provider>
     );

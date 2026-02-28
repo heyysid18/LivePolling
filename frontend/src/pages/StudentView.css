@@ -11,6 +11,29 @@
     justify-content: center;
 }
 
+/* Navbar Exit Button Styling */
+.navbar .btn-icon.log-out {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.navbar .btn-icon.log-out:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+    transform: translateY(-1px);
+}
+
 .waiting-container {
     display: flex;
     flex-direction: column;

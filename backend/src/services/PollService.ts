@@ -49,7 +49,8 @@ class PollServiceClass extends EventEmitter {
             options: options.map(opt => ({ ...opt, votes: 0 })),
             duration,
             createdBy,
-            status: 'active'
+            status: 'active',
+            removedStudents: []
         });
 
         const savedPoll = await newPoll.save();
@@ -64,7 +65,15 @@ class PollServiceClass extends EventEmitter {
      * Retrieves the currently active poll, if any.
      */
     async getActivePoll(): Promise<IPoll | null> {
-        return await Poll.findOne({ status: 'active' });
+        console.log(`[PollService] getActivePoll: Requesting DB...`);
+        try {
+            const poll = await Poll.findOne({ status: 'active' });
+            console.log(`[PollService] getActivePoll: DB responded successfully. (Found: ${!!poll})`);
+            return poll;
+        } catch (err: any) {
+            console.error(`[PollService] getActivePoll DB ERROR:`, err);
+            throw err;
+        }
     }
 
     /**
@@ -103,6 +112,11 @@ class PollServiceClass extends EventEmitter {
             const poll = await Poll.findById(pollId).session(session);
             if (!poll) throw new Error('Poll not found');
             if (poll.status !== 'active') throw new Error('Poll is no longer active');
+
+            // 1.5 Prevent removed students from voting
+            if (poll.removedStudents && poll.removedStudents.includes(studentName)) {
+                throw new Error('You have been removed by the teacher and cannot vote in this poll.');
+            }
 
             // 2. Prevent duplicate votes via DB read barrier
             const existingVote = await Vote.findOne({ pollId, studentName }).session(session);
@@ -148,6 +162,17 @@ class PollServiceClass extends EventEmitter {
             pollId,
             $or: [{ studentId }, { studentName }]
         });
+    }
+
+    /**
+     * Removes a student from the active poll, preventing them from voting further.
+     */
+    async removeStudent(pollId: string, studentName: string): Promise<IPoll | null> {
+        return await Poll.findByIdAndUpdate(
+            pollId,
+            { $addToSet: { removedStudents: studentName } },
+            { new: true }
+        );
     }
 
     /**

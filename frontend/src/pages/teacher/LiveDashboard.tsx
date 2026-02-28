@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { usePoll } from '../../hooks/usePoll';
 import { usePollTimer } from '../../hooks/usePollTimer';
 import { useTeacherControls } from '../../hooks/useTeacherControls';
+import { useSocketContext } from '../../contexts/SocketContext';
 import { useNavigate } from 'react-router-dom';
+import { Users, UserX, X } from 'lucide-react';
 import '../TeacherDashboard.css';
 
 const StarIcon = () => (
@@ -11,18 +13,24 @@ const StarIcon = () => (
     </svg>
 );
 
-const ChatIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z" fill="white" />
-    </svg>
-);
+
 
 const LiveDashboard: React.FC = () => {
+    const { appState, removeStudent } = useSocketContext();
     const { activePoll } = usePoll();
     const { currentTimer } = usePollTimer();
     const { endPoll } = useTeacherControls();
     const navigate = useNavigate();
-    const [chatOpen, setChatOpen] = useState(false);
+
+    const [sidebarOpen, setSidebarOpen] = useState(true); // Open by default
+    const [studentToRemove, setStudentToRemove] = useState<string | null>(null);
+
+    const handleConfirmRemove = () => {
+        if (studentToRemove && activePoll) {
+            removeStudent(activePoll._id, studentToRemove);
+            setStudentToRemove(null);
+        }
+    };
 
     useEffect(() => {
         if (!activePoll) {
@@ -86,25 +94,58 @@ const LiveDashboard: React.FC = () => {
                         )}
                     </div>
 
-                    <button className="floating-chat-btn" onClick={() => setChatOpen(!chatOpen)}>
-                        <ChatIcon />
+                    <button className="floating-chat-btn" onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: '#6E56CF', display: 'flex', gap: '8px', alignItems: 'center', padding: '0 20px', borderRadius: '24px', width: 'auto' }}>
+                        <Users color="white" size={20} />
+                        <span style={{ color: 'white', fontWeight: 600 }}>{appState.connectedStudents.length} Students</span>
                     </button>
 
-                    {chatOpen && (
-                        <div className="chat-window">
+                    {sidebarOpen && (
+                        <div className="chat-window" style={{ width: '350px' }}>
                             <div className="chat-tabs">
-                                <button className="chat-tab active">Chat</button>
-                                <button className="chat-tab">Participants</button>
+                                <button className="chat-tab active" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    Live Participants ({appState.connectedStudents.length})
+                                </button>
                             </div>
-                            <div className="chat-messages">
-                                <div className="message received">
-                                    <div className="message-sender">User 1</div>
-                                    <div className="message-bubble">Hey There , how can I help?</div>
-                                </div>
+                            <div className="chat-messages" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {appState.connectedStudents.length === 0 ? (
+                                    <div style={{ textAlign: 'center', color: '#6b7280', marginTop: '20px' }}>No students connected</div>
+                                ) : (
+                                    appState.connectedStudents.map(student => (
+                                        <div key={student.studentId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                            <span style={{ fontWeight: 500, color: '#334155' }}>{student.studentName}</span>
+                                            <button
+                                                onClick={() => setStudentToRemove(student.studentName)}
+                                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '4px' }}
+                                                title={`Remove ${student.studentName}`}
+                                            >
+                                                <UserX size={18} />
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
+
+                {/* Remove Student Confirmation Modal */}
+                {studentToRemove && (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                        <div style={{ background: 'white', padding: '32px', borderRadius: '12px', width: '400px', maxWidth: '90%', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <h3 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#1e293b' }}>Remove Student</h3>
+                                <button onClick={() => setStudentToRemove(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={20} /></button>
+                            </div>
+                            <p style={{ color: '#475569', marginBottom: '24px', lineHeight: 1.5 }}>
+                                Are you sure you want to remove <strong>{studentToRemove}</strong> from the poll? They will be immediately disconnected and blocked from rejoining.
+                            </p>
+                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                                <button onClick={() => setStudentToRemove(null)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontWeight: 600, cursor: 'pointer', color: '#475569' }}>Cancel</button>
+                                <button onClick={handleConfirmRemove} style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', background: '#ef4444', fontWeight: 600, cursor: 'pointer', color: 'white' }}>Yes, Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );
