@@ -9,10 +9,26 @@ import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
+// Determine allowed origins for CORS
+const ALLOWED_ORIGINS = [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'http://localhost:5173'
+];
+
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile/curl) and whitelisted origins
+        if (!origin || ALLOWED_ORIGINS.some(o => origin.startsWith(o))) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS blocked origin: ${origin}`));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 
 // Database Connection
