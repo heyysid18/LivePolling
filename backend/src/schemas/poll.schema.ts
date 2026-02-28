@@ -7,7 +7,8 @@ export const createPollSchema = z.object({
         text: z.string().min(1, 'Option text is required')
     })).min(2, 'At least 2 options are required').max(10, 'Maximum 10 options allowed'),
     duration: z.number().int().min(10, 'Timer must be at least 10 seconds').max(600, 'Timer must be at most 10 minutes'),
-    createdBy: z.string().min(1, 'Teacher ID is required')
+    createdBy: z.string().min(1, 'Teacher ID is required'),
+    sessionId: z.string().min(1, 'Session ID is required')
 });
 
 export const submitVoteSchema = z.object({

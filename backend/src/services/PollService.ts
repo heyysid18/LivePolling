@@ -39,7 +39,7 @@ class PollServiceClass extends EventEmitter {
     /**
      * Creates a new poll. Automatically completes any existing active poll.
      */
-    async createPoll(question: string, options: { id: string, text: string }[], duration: number, createdBy: string): Promise<IPoll> {
+    async createPoll(question: string, options: { id: string, text: string }[], duration: number, createdBy: string, sessionId: string): Promise<IPoll> {
         // End any currently active polls in DB
         await Poll.updateMany({ status: 'active' }, { status: 'completed' });
         this.stopTimer(); // Clear existing in-memory timer
@@ -50,7 +50,8 @@ class PollServiceClass extends EventEmitter {
             duration,
             createdBy,
             status: 'active',
-            removedStudents: []
+            removedStudents: [],
+            sessionId
         });
 
         const savedPoll = await newPoll.save();
@@ -182,6 +183,51 @@ class PollServiceClass extends EventEmitter {
         const poll = await Poll.findById(pollId);
         if (!poll) throw new Error('Poll not found');
         return poll.options;
+    }
+
+    /**
+     * Fetches all completed polls representing history (newest first).
+     */
+    async getPollHistory(): Promise<IPoll[]> {
+        // Find all completed polls, sort by most recent startTime
+        return await Poll.find({ status: 'completed' }).sort({ startTime: -1 });
+    }
+
+    /**
+     * Aggregates sum of all poll results per session.
+     */
+    async getSessionResults(sessionId: string) {
+        // Find all completed polls for this session
+        const polls = await Poll.find({ sessionId, status: 'completed' });
+
+        let totalVotesGlobal = 0;
+        const aggregateOptions = new Map<string, { text: string, votes: number }>();
+
+        polls.forEach(poll => {
+            poll.options.forEach(opt => {
+                totalVotesGlobal += opt.votes;
+                const existing = aggregateOptions.get(opt.id);
+                if (existing) {
+                    existing.votes += opt.votes;
+                } else {
+                    aggregateOptions.set(opt.id, { text: opt.text, votes: opt.votes });
+                }
+            });
+        });
+
+        const aggregatedArray = Array.from(aggregateOptions.entries()).map(([id, data]) => ({
+            id,
+            text: data.text,
+            votes: data.votes,
+            percentage: totalVotesGlobal === 0 ? 0 : Math.round((data.votes / totalVotesGlobal) * 100)
+        }));
+
+        return {
+            sessionId,
+            totalPolls: polls.length,
+            totalVotes: totalVotesGlobal,
+            aggregatedResults: aggregatedArray
+        };
     }
 
     /**

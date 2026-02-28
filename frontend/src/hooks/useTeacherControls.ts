@@ -13,7 +13,14 @@ export const useTeacherControls = () => {
             toast.error('All options must have text');
             return;
         }
-        createPoll(question, options, duration);
+
+        let sessionId = sessionStorage.getItem('polling_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            sessionStorage.setItem('polling_session_id', sessionId);
+        }
+
+        createPoll(question, options, duration, sessionId);
     };
 
     return {

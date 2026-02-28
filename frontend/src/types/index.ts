@@ -12,6 +12,7 @@ export interface Poll {
     status: 'active' | 'completed';
     startTime: string;
     createdBy: string;
+    sessionId: string;
 }
 
 export interface VoteData {

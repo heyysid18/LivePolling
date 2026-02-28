@@ -14,6 +14,7 @@ export interface IPoll extends Document {
     status: 'active' | 'completed';
     createdBy: string;
     removedStudents: string[];
+    sessionId: string;
 }
 
 const PollOptionSchema: Schema = new Schema({
@@ -29,7 +30,8 @@ const PollSchema: Schema = new Schema({
     status: { type: String, enum: ['active', 'completed'], default: 'active', index: true },
     startTime: { type: Date, default: Date.now },
     createdBy: { type: String, required: true, index: true },
-    removedStudents: { type: [String], default: [] }
+    removedStudents: { type: [String], default: [] },
+    sessionId: { type: String, required: true, index: true }
 });
 
 export default mongoose.model<IPoll>('Poll', PollSchema);

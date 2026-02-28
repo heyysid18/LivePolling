@@ -80,10 +80,10 @@ export default function setupSocket(io: Server) {
         });
 
         // Teacher creates poll
-        socket.on('create_poll', async (data: { question: string, options: { id: string, text: string }[], duration: number, createdBy: string }) => {
+        socket.on('create_poll', async (data: { question: string, options: { id: string, text: string }[], duration: number, createdBy: string, sessionId: string }) => {
             console.log(`[Socket] Received create_poll:`, data);
             try {
-                const poll = await PollService.createPoll(data.question, data.options, data.duration, data.createdBy);
+                const poll = await PollService.createPoll(data.question, data.options, data.duration, data.createdBy, data.sessionId);
                 console.log(`[Socket] createPoll successful. Emitting poll_started for poll ID: ${poll._id}`);
                 io.emit('poll_started', poll);
 

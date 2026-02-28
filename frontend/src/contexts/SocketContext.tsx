@@ -23,7 +23,7 @@ interface SocketContextContextType {
     appState: AppState;
     isLoading: boolean;
     setRole: (role: 'teacher' | 'student', name?: string) => void;
-    createPoll: (question: string, options: { id: string, text: string }[], timerDuration: number) => void;
+    createPoll: (question: string, options: { id: string, text: string }[], timerDuration: number, sessionId: string) => void;
     endPoll: () => void;
     removeStudent: (pollId: string, studentName: string) => void;
     castVote: (optionId: string) => void;
@@ -195,13 +195,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
     };
 
-    const createPoll = (question: string, options: { id: string, text: string }[], duration: number) => {
+    const createPoll = (question: string, options: { id: string, text: string }[], duration: number, sessionId: string) => {
         if (socket && appState.role === 'teacher') {
             socket.emit('create_poll', {
                 question,
                 options,
                 duration,
-                createdBy: appState.studentName || 'Teacher' // Use stored name or default
+                createdBy: appState.studentName || 'Teacher', // Use stored name or default
+                sessionId
             });
         }
     };

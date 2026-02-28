@@ -56,6 +56,12 @@ const CreatePoll: React.FC = () => {
                     <h1>Let's <span>Get Started</span></h1>
                     <p>you'll have the ability to create and manage polls, ask questions, and monitor your students' responses in real-time.</p>
                 </div>
+                <button
+                    onClick={() => navigate('/teacher/history')}
+                    style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, marginLeft: 'auto' }}
+                >
+                    View Poll History & Insights
+                </button>
             </header>
 
             <main className="dashboard-main">
