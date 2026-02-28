@@ -45,10 +45,16 @@ const TeacherDashboard: React.FC = () => {
         if (!question.trim()) return;
         if (options.some(opt => !opt.text.trim())) return;
 
+        let sessionId = sessionStorage.getItem('polling_session_id');
+        if (!sessionId) {
+            sessionId = crypto.randomUUID();
+            sessionStorage.setItem('polling_session_id', sessionId);
+        }
+
         // Strip out the isCorrect flag before emitting if backend doesn't support it, 
         // or keep it if we want to expand the model later.
         // For now, we'll send it as is, but assuming backend just uses 'text'
-        createPoll(question, options, duration);
+        createPoll(question, options, duration, sessionId);
         setQuestion('');
         setOptions([{ id: '1', text: '', isCorrect: true }, { id: '2', text: '', isCorrect: false }]);
     };
