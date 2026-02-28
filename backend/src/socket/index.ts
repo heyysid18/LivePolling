@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { PollService } from '../services/PollService';
+import { handleChatEvents } from './ChatSocketHandler';
 
 export default function setupSocket(io: Server) {
 
@@ -142,6 +143,9 @@ export default function setupSocket(io: Server) {
                 socket.emit('error_message', err.message || 'Failed to vote');
             }
         });
+
+        // Initialize chat events
+        handleChatEvents(io, socket);
 
         socket.on('disconnect', () => {
             console.log('Client disconnected:', socket.id);

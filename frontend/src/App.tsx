@@ -14,6 +14,7 @@ import PollHistory from './pages/teacher/PollHistory';
 import NameEntry from './pages/student/NameEntry';
 import PollQuestion from './pages/student/PollQuestion';
 import LiveResults from './pages/student/LiveResults';
+import ChatPopup from './components/ChatPopup';
 
 const RemovedScreen = ({ resetState }: { resetState: () => void }) => {
   useEffect(() => {
@@ -87,6 +88,9 @@ const App: React.FC = () => {
           <Route path="/student" element={<Navigate to="/student/join" replace />} />
 
         </Routes>
+
+        {/* Global Chat Component */}
+        {appState.role && <ChatPopup pollId="global" />}
       </div>
     </Router>
   );

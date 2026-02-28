@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import pollRoutes from './routes/poll.routes';
+import chatRoutes from './routes/chat.routes';
 import { getActivePoll } from './controllers/PollController';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -27,6 +28,7 @@ app.get('/poll/active', getActivePoll);
 
 // API Routes
 app.use('/api/polls', pollRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
